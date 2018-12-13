@@ -1,5 +1,4 @@
 include Makefile.settings
-include .env
 #! /bin/sh
 
 pipeline/%:
