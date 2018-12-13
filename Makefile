@@ -1,9 +1,10 @@
 include Makefile.settings
 #! /bin/sh
+export WSD=${PWD}../
 
 pipeline:
 	${INFO} "Running pipeline ..."
-	export WSD=pwd
+	${INFO} "Base directory ${WSD} "
 	@ make build
 	@ make invokeWithoutAWSLayer
 	@ make invokeFunctionBlackBox	
