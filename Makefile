@@ -10,7 +10,7 @@ pipeline:
 	@ make invokeFunctionBlackBox	
 	@ make compileTemplate
 	@ make postbuild
-	@ make deploy/api env=dev
+	@ make deploy env=dev
 	${INFO} "Completed CI/CD"
 
 build:
