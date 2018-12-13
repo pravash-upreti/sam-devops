@@ -14,6 +14,7 @@ npm install
 npm run build
 
 cp -rp dist/ $WSD/devops/build/dist/
+echo "Changed to $PWD"
 mkdir -p $WSD/devops/build/node_modules
 cp -rfp node_modules/* $WSD/devops/build/node_modules/ 
 cp -rp .env.example $WSD/devops/build/.env || echo "Could not find  .env.example"
