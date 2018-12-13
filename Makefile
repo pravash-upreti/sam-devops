@@ -1,19 +1,20 @@
 include Makefile.settings
 #! /bin/sh
 
-pipeline/%:
-	${INFO} "Running pipeline for $* ..."
-	@ make build/$*
+pipeline:
+	${INFO} "Running pipeline ..."
+	export WSD=pwd
+	@ make build
 	@ make invokeWithoutAWSLayer
 	@ make invokeFunctionBlackBox	
 	@ make compileTemplate
-	@ make postbuild/$*	
+	@ make postbuild
 	@ make deploy/api env=dev
 	${INFO} "Completed CI/CD"
 
-build/%:
-	${INFO} "Building $*..."
-	@ . ./scripts/build.sh $*
+build:
+	${INFO} "Building ..."
+	@ . ./scripts/build.sh
 	${INFO} "Completed"
 	
 
@@ -22,9 +23,9 @@ compileTemplate:
 	@ python ./scripts/compile.py
 	${INFO} "Completed"
 
-postbuild/%:
-	${INFO} "Making SAM compatible $* and uploading to s3 using deployer"
-	@ . ./scripts/postbuild.sh $*
+postbuild:
+	${INFO} "Making SAM compatible and uploading to s3 using deployer"
+	@ . ./scripts/postbuild.sh 
 	${INFO} "Completed"
 
 invokeFunctionBlackBox:
@@ -39,7 +40,7 @@ invokeWithoutAWSLayer:
 	${INFO} "Completed"
 
 
-deploy/%:
-	${INFO} "Deploying to $* environment"
-	@ . ./scripts/deploy.sh $* ${env}
+deploy:
+	${INFO} "Deploying to environment"
+	@ . ./scripts/deploy.sh ${env}
 	${INFO} "Deploy completed"
