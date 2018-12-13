@@ -1,6 +1,6 @@
 include Makefile.settings
 #! /bin/sh
-export WSD=${PWD}../
+export WSD=${PWD}/../
 
 pipeline:
 	${INFO} "Running pipeline ..."
