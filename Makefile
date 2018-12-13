@@ -31,13 +31,13 @@ postbuild:
 
 invokeFunctionBlackBox:
 	${INFO} "Black Box function invocation"
-	@ docker run -v "${PWD}/tmp:/home/sbx_user1051" -v "${PWD}/build:/var/task" lambci/lambda:nodejs8.10 lambda.handler
+	@ docker run -v "${PWD}/tmp:/home/sbx_user1051" -v "${PWD}/build:/var/task" -e LOG_DIR='/tmp' -e BABEL_CACHE_PATH='/tmp/mycache.json' lambci/lambda:nodejs8.10 lambda.handler
 	${INFO} "Completed"
 
 invokeWithoutAWSLayer:
 	${INFO} "Invoke without AWS Layer"
 	@ docker build -t lambdanodewithoutawslayer:latest .
-	@ docker run -v ${PWD}/tmp:/home/sbx_user1051  lambdanodewithoutawslayer
+	@ docker run -v ${PWD}/tmp:/home/sbx_user1051  -e LOG_DIR='/tmp' -e BABEL_CACHE_PATH='/tmp/mycache.json' lambdanodewithoutawslayer
 	${INFO} "Completed"
 
 
