@@ -34,4 +34,4 @@ sed -i 's#PROXY_API_REGION#'$AWS_DEFAULT_REGION'#g' build/simple-proxy-api.yaml
 
 # do not override the original content
 # -rpn not supported in alpine
-cp -rp ./sam-build/node_modules/* ./build/node_modules
+cp -rpn ./sam-build/node_modules/* ./build/node_modules
