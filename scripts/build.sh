@@ -34,8 +34,6 @@ sed -i 's#LAMBDA_MODULE_DIR#'${LAMBDA_MODULE_DIR:="dist/lambda"}'#g' ./build/lam
 cp -p sam-assets/test.js build/test.js
 cp -p sam-assets/simple-proxy-api.yaml build/simple-proxy-api.yaml
 
-sed -i 's#PROXY_API_REGION#'$AWS_DEFAULT_REGION'#g' build/simple-proxy-api.yaml
-
 # do not override the original content
 # -rpn not supported in alpine
 cp -rpn ./sam-build/node_modules/* ./build/node_modules

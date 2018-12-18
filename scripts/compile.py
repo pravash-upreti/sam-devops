@@ -27,7 +27,9 @@ config_file = open("./sam-assets/template.yaml", "w+")
 config_file.write(template.render(list = [formatedData]))
 
 # Compile simple proxy
-
+data.update({
+    "PROXY_API_REGION": os.environ["PROXY_API_REGION"]
+})
 proxy_api = env.get_template('simple-proxy-api.yaml.j2')
 config_file = open("./sam-assets/simple-proxy-api.yaml", "w+")
 config_file.write(proxy_api.render(list = [data]))
