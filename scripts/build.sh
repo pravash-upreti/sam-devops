@@ -26,6 +26,10 @@ cp -rp package.json $WSD/devops/build/ || echo "Couldnot find package.json  fold
 cd $WSD/devops/
 
 cp -p sam-assets/lambda.js build/lambda.js
+
+#substitute the value
+sed -i 's@LAMBDA_MODULE_DIR@' "${LAMBDA_MODULE_DIR:=dist/lambda} " '@' ./build/lambda.js
+
 # cp -p sam-assets/app.js build/app.js
 cp -p sam-assets/test.js build/test.js
 cp -p sam-assets/simple-proxy-api.yaml build/simple-proxy-api.yaml
