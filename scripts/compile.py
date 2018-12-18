@@ -4,6 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 import requests
 import json
 
+
 url = os.environ["VAULT_SERVER"]+"/v1/secret/"+os.environ["VAULT_SECRET_DIR"]
 headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8','X-Vault-Token':os.environ["VAULT_TOKEN"]}
 response = requests.get(url, headers=headers)
@@ -18,7 +19,15 @@ for key in data:
     })
 
 env = Environment(loader = FileSystemLoader('./scripts'), trim_blocks=True, lstrip_blocks=True)
-template = env.get_template('template.yaml.j2')
 
+# Compile template.yml
+
+template = env.get_template('template.yaml.j2')
 config_file = open("./sam-assets/template.yaml", "w")
 config_file.write(template.render(list = [formatedData]))
+
+# Compile simple proxy
+
+proxy_api = env.get_template('simple-proxy-api.yaml.j2')
+config_file = open("./sam-assets/simple-proxy-api.yaml", "w")
+config_file.write(proxy_api.render(list = [formatedData]))
