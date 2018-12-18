@@ -28,7 +28,7 @@ config_file.write(template.render(list = [formatedData]))
 
 # Compile simple proxy
 data.update({
-    "PROXY_API_REGION": os.environ["PROXY_API_REGION"]
+    "PROXY_API_REGION": os.environ["AWS_DEFAULT_REGION"]
 })
 proxy_api = env.get_template('simple-proxy-api.yaml.j2')
 config_file = open("./sam-assets/simple-proxy-api.yaml", "w+")

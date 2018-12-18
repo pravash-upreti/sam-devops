@@ -5,10 +5,10 @@ export WSD=${PWD}/../
 pipeline:
 	${INFO} "Running pipeline ..."
 	${INFO} "Base directory ${WSD} "
-	@ make build
-	@ make invokeWithoutAWSLayer
-	@ make invokeFunctionBlackBox	
 	@ make compileTemplate
+	@ make build	
+	@ make invokeWithoutAWSLayer
+	@ make invokeFunctionBlackBox		
 	@ make postbuild
 	@ make deploy env="${CI_COMMIT_REF_SLUG}"
 	${INFO} "Completed CI/CD"
