@@ -32,9 +32,11 @@ for key in data:
     nonFormatedData.update({
         key: data[key]
     })
-nonFormatedData.update({
-    "PROXY_API_REGION": os.environ["AWS_DEFAULT_REGION"]
-})
+
+for key in os.environ:
+    nonFormatedData.update({
+        key: data[key]
+    })
 
 proxy_api = env.get_template('simple-proxy-api.yaml.j2')
 config_file = open("./sam-assets/simple-proxy-api.yaml", "w+")
