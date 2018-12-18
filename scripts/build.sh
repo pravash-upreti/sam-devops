@@ -28,7 +28,7 @@ cd $WSD/devops/
 cp -p sam-assets/lambda.js build/lambda.js
 
 #substitute the value
-sed -i 's#LAMBDA_MODULE_DIR#' ${LAMBDA_MODULE_DIR:="dist/lambda"} '#g' ./build/lambda.js
+sed -i 's#LAMBDA_MODULE_DIR#'${LAMBDA_MODULE_DIR:="dist/lambda"}'#g' ./build/lambda.js
 
 # cp -p sam-assets/app.js build/app.js
 cp -p sam-assets/test.js build/test.js
