@@ -38,4 +38,4 @@ nonFormatedData.update({
 print nonFormatedData
 proxy_api = env.get_template('simple-proxy-api.yaml.j2')
 config_file = open("./sam-assets/simple-proxy-api.yaml", "w+")
-config_file.write(proxy_api.render(list = [nonFormatedData]))
+config_file.write(proxy_api.render(nonFormatedData))
