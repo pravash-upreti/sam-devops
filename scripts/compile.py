@@ -33,9 +33,9 @@ for key in data:
         key: data[key]
     })
 
-for key in os.environ:
+for key , value in os.environ.items():
     nonFormatedData.update({
-        key: data[key]
+        key: value
     })
 
 proxy_api = env.get_template('simple-proxy-api.yaml.j2')
