@@ -23,11 +23,11 @@ env = Environment(loader = FileSystemLoader('./scripts'), trim_blocks=True, lstr
 # Compile template.yml
 
 template = env.get_template('template.yaml.j2')
-config_file = open("./sam-assets/template.yaml", "w")
+config_file = open("./sam-assets/template.yaml", "w+")
 config_file.write(template.render(list = [formatedData]))
 
 # Compile simple proxy
 
 proxy_api = env.get_template('simple-proxy-api.yaml.j2')
-config_file = open("./sam-assets/simple-proxy-api.yaml", "w")
-config_file.write(proxy_api.render(list = [formatedData]))
+config_file = open("./sam-assets/simple-proxy-api.yaml", "w+")
+config_file.write(proxy_api.render(list = [data]))
