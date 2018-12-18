@@ -10,7 +10,8 @@ pipeline:
 	@ make invokeFunctionBlackBox	
 	@ make compileTemplate
 	@ make postbuild
-	@ make deploy env=${CI_COMMIT_REF_SLUG=:dev}
+	${INFO} "Deploying to environment ${CI_COMMIT_REF_SLUG:=dev}"
+	@ make deploy env="${CI_COMMIT_REF_SLUG:=dev}"
 	${INFO} "Completed CI/CD"
 
 build:
