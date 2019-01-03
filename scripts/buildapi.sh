@@ -33,7 +33,7 @@ sed -i 's#APP_MODULE_DIR#'${APP_MODULE_DIR:="dist/app"}'#g' ./build/app.js
 
 # cp -p sam-assets/app.js build/app.js
 cp -p sam-assets/test.js build/test.js
-cp -p sam-assets/simple-proxy-api.yaml build/simple-proxy-api.yaml
+#cp -p sam-assets/simple-proxy-api.yaml build/simple-proxy-api.yaml
 
 # do not override the original content
 # -rpn not supported in alpine

@@ -29,6 +29,20 @@ const binaryMimeTypes = [
 const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes)
 
 exports.handler = (event, context) => {
-  console.log("starting proxy")
+
+  try {
+    if(!event)
+      console.log("Invalid event")
+
+    var removePath = event.resource.split('/{proxy+}')[0]  
+    event.resource = event.resource.replace(removePath,'')  
+    event.path =   event.path.replace(removePath,'')
+    
+    event.requestContext.resourcePath = event.requestContext.resourcePath.replace(removePath,'')
+    event.requestContext.path =   event.requestContext.path.replace(removePath,'')
+  }
+  catch(err) {
+    console.log(err)
+  }
   awsServerlessExpress.proxy(server, event, context)
 }
