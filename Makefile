@@ -30,6 +30,7 @@ buildapp:
 compileTemplate:
 	${INFO} "Compiling template"
 	@ python ./scripts/compile.py
+	@ cat sam-assets/template.yaml
 	${INFO} "Completed"
 
 postbuild:
