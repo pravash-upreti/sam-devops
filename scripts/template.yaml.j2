@@ -55,7 +55,7 @@ Resources:
     Properties: 
       RestApiId: 
         Fn::ImportValue:
-          !Sub "${BaseStack}-rest-api-id"
+          !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
       ParentId:
         Fn::ImportValue:
           !Sub "${BaseStack}-api-path-reference"
@@ -72,7 +72,7 @@ Resources:
         !Ref MicroServiceResource
       RestApiId:
         Fn::ImportValue:
-          !Sub "${BaseStack}-rest-api-id"
+          !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
       AuthorizationType: NONE
       
       Integration:        
@@ -106,7 +106,7 @@ Resources:
         !Ref MicroServiceResource
       RestApiId:
         Fn::ImportValue:
-          !Sub "${BaseStack}-rest-api-id"
+          !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
       AuthorizationType: NONE
       Integration:
         ContentHandling: CONVERT_TO_TEXT
@@ -140,7 +140,7 @@ Resources:
     Properties: 
       RestApiId: 
         Fn::ImportValue:
-          !Sub "${BaseStack}-rest-api-id"
+          !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
       ParentId:
         #Fn::ImportValue:
         #  !Sub "${BaseStack}-rest-api-root-id"
@@ -156,7 +156,7 @@ Resources:
         !Ref ProxyResource
       RestApiId:
         Fn::ImportValue:
-          !Sub "${BaseStack}-rest-api-id"
+          !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
       AuthorizationType: NONE
       Integration:
         ContentHandling: CONVERT_TO_TEXT
@@ -190,7 +190,7 @@ Resources:
         !Ref ProxyResource
       RestApiId:        
         Fn::ImportValue:
-          !Sub "${BaseStack}-rest-api-id"
+          !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
       AuthorizationType: NONE
       
       Integration:
@@ -211,7 +211,7 @@ Resources:
   #  Properties: 
   #    RestApiId: 
   #      Fn::ImportValue:
-  #        !Sub "${BaseStack}-rest-api-id"
+  #        !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
   #    Description: "Default Deployment"
   #    StageName: "api"
       
@@ -271,7 +271,7 @@ Resources:
           - !Ref AWS::AccountId
           - ":"
           - Fn::ImportValue:
-              !Sub "${BaseStack}-rest-api-id"
+              !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
           - "/*/*"
   
   # RDSState:
@@ -328,7 +328,7 @@ Resources:
       #    Properties:
       #      RestApiId: 
       #        Fn::ImportValue:
-      #          !Sub "${BaseStack}-rest-api-id"
+      #          !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
       #      Path: /
       #      Method: ANY
       #  ProxyApiGreedy:
@@ -336,7 +336,7 @@ Resources:
       #    Properties:
       #      RestApiId:
       #        Fn::ImportValue:
-      #          !Sub "${BaseStack}-rest-api-id"
+      #          !Sub "${BaseStack}-rest-api-id-{{CI_COMMIT_REF_SLUG}}"
       #      #!Ref ApiGatewayApi
       #      Path: /{proxy+}
       #      Method: ANY
