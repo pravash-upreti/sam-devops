@@ -6,13 +6,13 @@ export WSD=${PWD}/../
 pipeline:
 	${INFO} "Running pipeline ..."
 	${INFO} "Base directory ${WSD} "	
-	#@ make buildapi	
+	@ make buildapi
 	@ make buildapp
-	#@ make invokeWithoutAWSLayer
-	#@ make invokeFunctionBlackBox		
-	#@ make postbuild
-	#@ make compileTemplate
-	#@ make deploy env="${CI_COMMIT_REF_SLUG}"
+	@ make invokeWithoutAWSLayer
+	@ make invokeFunctionBlackBox
+	@ make postbuild
+	@ make compileTemplate
+	@ make deploy env="${CI_COMMIT_REF_SLUG}"
 	@ make deployapp env="${CI_COMMIT_REF_SLUG}"
 	${INFO} "Completed CI/CD"
 

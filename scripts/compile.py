@@ -30,7 +30,7 @@ formatedData.update({
     "FUNCTION_NAME": open('function_name', 'r').readline().rstrip()
 })
 
-print formatedData
+# print formatedData
 env = Environment(loader = FileSystemLoader('./scripts'), trim_blocks=True, lstrip_blocks=True)
 
 # Compile template.yml
