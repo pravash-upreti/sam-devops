@@ -58,7 +58,7 @@ Resources:
           !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
       ParentId:
         Fn::ImportValue:
-          !Sub "${BaseStack}-api-path-reference"
+          !Sub "${BaseStack}-api-path-reference-{{list[0]["STAGE"]}}"
       PathPart: {{list[0]["MICRO_SERVICE_NAME"]}}
 
   MicroServiceAllMethod:
