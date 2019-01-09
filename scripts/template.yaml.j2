@@ -64,7 +64,7 @@ Resources:
   MicroServiceAllMethod:
     DependsOn:
       - MicroServiceResource
-      - AwsServerlessExpressFunction
+      - {{list[0]["MICRO_SERVICE_NAME"]}}Function
     Type: AWS::ApiGateway::Method
     Properties:
       HttpMethod: ANY
@@ -82,7 +82,7 @@ Resources:
           Fn::Join:
             - ""
             - - "arn:aws:apigateway:{{list[0]["AWS_DEFAULT_REGION"]}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{list[0]["AWS_DEFAULT_REGION"]}}:{{list[0]["AWS_ACCOUNT_ID"]}}:function:"
-              - !Ref AwsServerlessExpressFunction
+              - !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
               - "/invocations"
         PassthroughBehavior: WHEN_NO_MATCH
         IntegrationResponses:
@@ -200,7 +200,7 @@ Resources:
           Fn::Join:
             - ""
             - - "arn:aws:apigateway:{{list[0]["AWS_DEFAULT_REGION"]}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{list[0]["AWS_DEFAULT_REGION"]}}:{{list[0]["AWS_ACCOUNT_ID"]}}:function:"
-              - !Ref AwsServerlessExpressFunction
+              - !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
               - "/invocations"        
       RequestParameters:
         method.request.path.proxy: true
@@ -219,10 +219,10 @@ Resources:
     Type: "AWS::Lambda::Permission"
     DependsOn:
     # - ApiGatewayApi
-    - AwsServerlessExpressFunction
+    - {{list[0]["MICRO_SERVICE_NAME"]}}Function
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref AwsServerlessExpressFunction
+      FunctionName: !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
       Principal: apigateway.amazonaws.com
 
   #ApiGatewayApi:
@@ -231,7 +231,7 @@ Resources:
   #    DefinitionUri: ../build/simple-proxy-api.yaml
   #    StageName: default
   #    Variables:
-  #      ServerlessExpressLambdaFunctionName: !Ref AwsServerlessExpressFunction
+  #      ServerlessExpressLambdaFunctionName: !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
 
 #   LambdaExecutionRole:
 #     Type: AWS::IAM::Role
@@ -261,7 +261,7 @@ Resources:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !GetAtt AwsServerlessExpressFunction.Arn
+      FunctionName: !GetAtt {{list[0]["MICRO_SERVICE_NAME"]}}Function.Arn
       Principal: apigateway.amazonaws.com
       SourceArn: !Join
         - ''
@@ -351,7 +351,7 @@ Resources:
 #        - ".console.aws.amazon.com/lambda/home?region="
 #        - !Ref AWS::Region
 #        - "#/functions/"
-#        - !Ref AwsServerlessExpressFunction
+#        - !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
 
 #  ApiGatewayApiConsoleUrl:
 #    Description: Console URL for the API Gateway API's Stage.
