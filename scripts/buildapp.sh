@@ -8,6 +8,6 @@ curl --header "X-Vault-Token:$VAULT_TOKEN" $VAULT_SERVER/v1/secret/$VAULT_SECRET
 # rm -rf build_app
 # mkdir -p build_app
 
-# cd $WSD/$APP_DIR
-# npm install
-# npm run build
+cd $WSD/$APP_DIR
+npm install
+npm run build
