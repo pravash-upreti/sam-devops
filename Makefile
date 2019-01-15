@@ -1,6 +1,27 @@
 include Makefile.settings
 #! /bin/sh
 export WSD=${PWD}/../
+
+
+if [  $CI_COMMIT_REF_SLUG == "dev" ]
+then
+   export STAGE=dev
+if [  $CI_COMMIT_REF_SLUG == "uat" ]
+then
+   export STAGE=uat
+if [  $CI_COMMIT_REF_SLUG == "qa" ]
+then
+   export STAGE=qa
+if [  $CI_COMMIT_REF_SLUG == "release" ]
+then
+   export STAGE=staging
+if [  $CI_COMMIT_REF_SLUG == "master" ]
+then
+   export STAGE=prod
+else
+   echo "Undefine stage"
+fi
+
 .PHONY: build
 
 pipeline:
