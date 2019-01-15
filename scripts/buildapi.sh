@@ -26,11 +26,14 @@ cp -rp package.json $WSD/devops/build/ || echo "Couldnot find package.json  fold
 cd $WSD/devops/
 
 cp -p sam-assets/lambda.js build/lambda.js
+cp -p sam-assets/app.js build/app.js
+
+#substitute the value
+sed -i 's#APP_MODULE_DIR#'${APP_MODULE_DIR:="dist/app"}'#g' ./build/app.js
+
 # cp -p sam-assets/app.js build/app.js
 cp -p sam-assets/test.js build/test.js
-cp -p sam-assets/simple-proxy-api.yaml build/simple-proxy-api.yaml
-
-sed -i 's#PROXY_API_REGION#'$AWS_DEFAULT_REGION'#g' build/simple-proxy-api.yaml
+#cp -p sam-assets/simple-proxy-api.yaml build/simple-proxy-api.yaml
 
 # do not override the original content
 # -rpn not supported in alpine

@@ -1,27 +1,36 @@
 include Makefile.settings
 #! /bin/sh
 export WSD=${PWD}/../
+.PHONY: build
 
 pipeline:
 	${INFO} "Running pipeline ..."
-	${INFO} "Base directory ${WSD} "
-	@ make build
+	${INFO} "Base directory ${WSD} "	
+	@ make buildapi
+	@ make buildapp
 	@ make invokeWithoutAWSLayer
-	@ make invokeFunctionBlackBox	
-	@ make compileTemplate
+	@ make invokeFunctionBlackBox
 	@ make postbuild
-	@ make deploy env=dev
+	@ make compileTemplate
+	@ make deploy env="${CI_COMMIT_REF_SLUG}"
+	@ make deployapp env="${CI_COMMIT_REF_SLUG}"
 	${INFO} "Completed CI/CD"
 
-build:
+buildapi:
 	${INFO} "Building ..."
-	@ . ./scripts/build.sh
+	@ . ./scripts/buildapi.sh
 	${INFO} "Completed"
-	
+
+buildapp:
+	${INFO} "Building ..."
+	@ . ./scripts/buildapp.sh
+	${INFO} "Completed"
+
 
 compileTemplate:
 	${INFO} "Compiling template"
 	@ python ./scripts/compile.py
+	@ cat sam-assets/template.yaml
 	${INFO} "Completed"
 
 postbuild:
@@ -44,4 +53,10 @@ invokeWithoutAWSLayer:
 deploy:
 	${INFO} "Deploying to environment"
 	@ . ./scripts/deploy.sh ${env}
+	${INFO} "Deploy completed"
+
+
+deployapp:
+	${INFO} "Deploying to environment"
+	@ . ./scripts/deployapp.sh ${env}
 	${INFO} "Deploy completed"
