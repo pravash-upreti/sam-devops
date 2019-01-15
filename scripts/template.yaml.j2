@@ -17,17 +17,21 @@ Parameters:
 
   BaseStack:
     Type: String
-    Default: lms-timesheet
+    Default: base-stack-name
     NoEcho: true
     Description: Base SAM stack
 
-  {% for dict_item in list %}
-  {% for snake_case, CamelCase in dict_item.items() %}
+  MicorServiceName:
+    Type: String
+    Default: microservice
+    NoEcho: true
+    Description: Microservice name  
+  {% for dict_item in list %}    
+  {% for snake_case, CamelCase in dict_item["vault"].items() %}
   {{ CamelCase }}:
     Type: String
     NoEcho: true
-
-  {% endfor %}
+  {% endfor %}  
   {% endfor %}
 
 
@@ -45,24 +49,189 @@ Conditions:
     Fn::Or: [Condition: RDSState ,Condition: RDSSecurityGroup]
 
 Resources:
+
+  MicroServiceResource: 
+    Type: AWS::ApiGateway::Resource
+    Properties: 
+      RestApiId: 
+        Fn::ImportValue:
+          !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+      ParentId:
+        Fn::ImportValue:
+          !Sub "${BaseStack}-api-path-reference-{{list[0]["STAGE"]}}"
+      PathPart: {{list[0]["MICRO_SERVICE_NAME"]}}
+
+  MicroServiceAllMethod:
+    DependsOn:
+      - MicroServiceResource
+      - {{list[0]["MICRO_SERVICE_NAME"]}}Function
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: ANY
+      ResourceId:
+        !Ref MicroServiceResource
+      RestApiId:
+        Fn::ImportValue:
+          !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+      AuthorizationType: NONE
+      
+      Integration:        
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: 
+          Fn::Join:
+            - ""
+            - - "arn:aws:apigateway:{{list[0]["AWS_DEFAULT_REGION"]}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{list[0]["AWS_DEFAULT_REGION"]}}:{{list[0]["AWS_ACCOUNT_ID"]}}:function:"
+              - !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
+              - "/invocations"
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: 200
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: 'Empty'
+      
+      #RequestParameters:
+      #  method.request.in.proxy: true
+      
+      
+  
+  MicroServiceOptionMethod:    
+    DependsOn: "MicroServiceAllMethod"
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: OPTIONS
+      ResourceId:
+        !Ref MicroServiceResource
+      RestApiId:
+        Fn::ImportValue:
+          !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+      AuthorizationType: NONE
+      Integration:
+        ContentHandling: CONVERT_TO_TEXT
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            #ResponseTemplates:
+              #application/json: "{\"statusCode\": 200}"
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: "{statusCode: 200}"
+        Type: MOCK
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: 'Empty'
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  
+  
+  
+  ProxyResource: 
+    DependsOn: "MicroServiceOptionMethod"
+    Type: AWS::ApiGateway::Resource
+    Properties: 
+      RestApiId: 
+        Fn::ImportValue:
+          !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+      ParentId:
+        #Fn::ImportValue:
+        #  !Sub "${BaseStack}-rest-api-root-id"
+        !Ref "MicroServiceResource"
+      PathPart: "{proxy+}"
+  
+  
+  ProxyOptionMethod:    
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: OPTIONS
+      ResourceId:
+        !Ref ProxyResource
+      RestApiId:
+        Fn::ImportValue:
+          !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+      AuthorizationType: NONE
+      Integration:
+        ContentHandling: CONVERT_TO_TEXT
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            #ResponseTemplates:
+              #application/json: "{\"statusCode\": 200}"
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: "{statusCode: 200}"
+        Type: MOCK
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: 'Empty'
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+  
+  ProxyAllMethod:    
+    DependsOn: "ProxyOptionMethod"
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: ANY
+      ResourceId:
+        !Ref ProxyResource
+      RestApiId:        
+        Fn::ImportValue:
+          !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+      AuthorizationType: NONE
+      
+      Integration:
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: 
+          Fn::Join:
+            - ""
+            - - "arn:aws:apigateway:{{list[0]["AWS_DEFAULT_REGION"]}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{list[0]["AWS_DEFAULT_REGION"]}}:{{list[0]["AWS_ACCOUNT_ID"]}}:function:"
+              - !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
+              - "/invocations"        
+      RequestParameters:
+        method.request.path.proxy: true
+      
+  #ApiDeployment: 
+  #  DependsOn: "ProxyAllMethod"    
+  #  Type: AWS::ApiGateway::Deployment
+  #  Properties: 
+  #    RestApiId: 
+  #      Fn::ImportValue:
+  #        !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+  #    Description: "Default Deployment"
+  #    StageName: "api"
+      
   ConfigLambdaPermission:
     Type: "AWS::Lambda::Permission"
     DependsOn:
-    - ApiGatewayApi
-    - AwsServerlessExpressFunction
+    # - ApiGatewayApi
+    - {{list[0]["MICRO_SERVICE_NAME"]}}Function
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref AwsServerlessExpressFunction
+      FunctionName: !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
       Principal: apigateway.amazonaws.com
 
-  ApiGatewayApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      DefinitionUri: ../build/simple-proxy-api.yaml
-      StageName: prod
-      Variables:
-        ServerlessExpressLambdaFunctionName: !Ref AwsServerlessExpressFunction
-
+  #ApiGatewayApi:
+  #  Type: AWS::Serverless::Api
+  #  Properties:
+  #    DefinitionUri: ../build/simple-proxy-api.yaml
+  #    StageName: default
+  #    Variables:
+  #      ServerlessExpressLambdaFunctionName: !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
 
 #   LambdaExecutionRole:
 #     Type: AWS::IAM::Role
@@ -92,7 +261,7 @@ Resources:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !GetAtt AwsServerlessExpressFunction.Arn
+      FunctionName: !GetAtt {{list[0]["MICRO_SERVICE_NAME"]}}Function.Arn
       Principal: apigateway.amazonaws.com
       SourceArn: !Join
         - ''
@@ -101,14 +270,15 @@ Resources:
           - ":"
           - !Ref AWS::AccountId
           - ":"
-          - !Ref ApiGatewayApi
+          - Fn::ImportValue:
+              !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
           - "/*/*"
   
   # RDSState:
     
 
-  AwsServerlessExpressFunction:
-    Type: AWS::Serverless::Function
+  {{list[0]["MICRO_SERVICE_NAME"]}}Function:
+    Type: AWS::Lambda::Function
     Properties:
       VpcConfig: 
         Fn::If:
@@ -130,8 +300,12 @@ Resources:
                   !Sub "${BaseStack}-private-subnet-b"
             
           - Ref: AWS::NoValue
-          
-      CodeUri: ../build
+      
+        
+      Code:
+        S3Bucket: {{list[0]["S3_BUCKET_NAME"]}}
+        S3Key: {{list[0]["FUNCTION_NAME"]}}.zip
+
       Handler: lambda.handler
       MemorySize: 1024
       Role: 
@@ -143,56 +317,61 @@ Resources:
       Environment:
         Variables:
           {% for dict_item in list %}
-          {% for snake_case, CamelCase in dict_item.items() %}
+          {% for snake_case, CamelCase in dict_item["vault"].items() %}
           {{ snake_case }}: !Sub {{ '${'+CamelCase+'}' }}
           {% endfor %}
           {% endfor %}
         
-      Events:
-        ProxyApiRoot:
-          Type: Api
-          Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /
-            Method: ANY
-        ProxyApiGreedy:
-          Type: Api
-          Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /{proxy+}
-            Method: ANY
+      #Events:
+      #  ProxyApiRoot:
+      #    Type: Api
+      #    Properties:
+      #      RestApiId: 
+      #        Fn::ImportValue:
+      #          !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+      #      Path: /
+      #      Method: ANY
+      #  ProxyApiGreedy:
+      #    Type: Api
+      #    Properties:
+      #      RestApiId:
+      #        Fn::ImportValue:
+      #          !Sub "${BaseStack}-rest-api-id-{{list[0]["STAGE"]}}"
+      #      #!Ref ApiGatewayApi
+      #      Path: /{proxy+}
+      #      Method: ANY
      
-Outputs:
-  LambdaFunctionConsoleUrl:
-    Description: Console URL for the Lambda Function.
-    Value: !Join
-      - ''
-      - - https://
-        - !Ref AWS::Region
-        - ".console.aws.amazon.com/lambda/home?region="
-        - !Ref AWS::Region
-        - "#/functions/"
-        - !Ref AwsServerlessExpressFunction
+#Outputs:
+#  LambdaFunctionConsoleUrl:
+#    Description: Console URL for the Lambda Function.
+#    Value: !Join
+#      - ''
+#      - - https://
+#        - !Ref AWS::Region
+#        - ".console.aws.amazon.com/lambda/home?region="
+#        - !Ref AWS::Region
+#        - "#/functions/"
+#        - !Ref {{list[0]["MICRO_SERVICE_NAME"]}}Function
 
-  ApiGatewayApiConsoleUrl:
-    Description: Console URL for the API Gateway API's Stage.
-    Value: !Join
-      - ''
-      - - https://
-        - !Ref AWS::Region
-        - ".console.aws.amazon.com/apigateway/home?region="
-        - !Ref AWS::Region
-        - "#/apis/"
-        - !Ref ApiGatewayApi
-        - "/stages/prod"
+#  ApiGatewayApiConsoleUrl:
+#    Description: Console URL for the API Gateway API's Stage.
+#    Value: !Join
+#      - ''
+#      - - https://
+#        - !Ref AWS::Region
+#        - ".console.aws.amazon.com/apigateway/home?region="
+#        - !Ref AWS::Region
+#        - "#/apis/"
+#        - !Ref ApiGatewayApi
+#        - "/stages/default"
 
-  ApiUrl:
-    Description: Invoke URL for your API. Clicking this link will perform a GET request
-      on the root resource of your API.
-    Value: !Join
-      - ''
-      - - https://
-        - !Ref ApiGatewayApi
-        - ".execute-api."
-        - !Ref AWS::Region
-        - ".amazonaws.com/prod/"
+#  ApiUrl:
+#    Description: Invoke URL for your API. Clicking this link will perform a GET request
+#      on the root resource of your API.
+#    Value: !Join
+#      - ''
+#      - - https://
+#        - !Ref ApiGatewayApi
+#        - ".execute-api."
+#        - !Ref AWS::Region
+#        - ".amazonaws.com/default/"
