@@ -33,7 +33,7 @@ exports.handler = (event, context) => {
   try {
     if(!event)
       console.log("Invalid event")
-    console.log(event.resource)
+    console.log(event)    
     var removePath = event.resource.split('/{proxy+}')[0]  
     event.resource = event.resource.replace(removePath,'')  
     event.path =   event.path.replace(removePath,'')
