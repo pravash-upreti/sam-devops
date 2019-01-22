@@ -21,11 +21,6 @@ Parameters:
     NoEcho: true
     Description: Base SAM stack
   
-  MicorServiceName:
-    Type: String
-    Default: microservice
-    NoEcho: true
-    Description: Microservice name  
   {% for dict_item in list %}    
   {% for snake_case, CamelCase in dict_item["vault"].items() %}
   {{ CamelCase }}:
@@ -325,8 +320,7 @@ Resources:
       Tags: 
         - 
           Key: "Name"
-          Value: 
-            Ref: "MicorServiceName"
+          Value: {{list[0]["MICRO_SERVICE_NAME"]}}
         - 
           Key: "Project"
           Value: 
