@@ -20,6 +20,32 @@ Parameters:
     Default: base-stack-name
     NoEcho: true
     Description: Base SAM stack
+  
+  ProjectCustomer:
+    Type: String
+    Default: Leapfrog
+    Description: Add Project customer
+
+  ProjectName:
+    Type: String
+    Default: sam-project
+    Description: Add Project name
+
+  ProjectType:
+    Type: String
+    Default: temporary
+    Description: Add Project type
+  
+  ProjectDescription:
+    Type: String
+    Default: Please provide description
+    Description: Add Project description
+
+  ProjectDeployment:
+    Type: String
+    Default: development
+    Description: Add Project deployment
+
 
   MicorServiceName:
     Type: String
@@ -321,6 +347,37 @@ Resources:
           {{ snake_case }}: !Sub {{ '${'+CamelCase+'}' }}
           {% endfor %}
           {% endfor %}
+      
+      Tags: 
+        - 
+          Key: "Name"
+          Value: 
+            Ref: "MicorServiceName"
+        - 
+          Key: "Project"
+          Value: 
+            Fn::ImportValue:
+              !Sub "${BaseStack}-tag-project-name"
+        - 
+          Key: "Customer"
+          Value: 
+            Fn::ImportValue:
+              !Sub "${BaseStack}-tag-project-customer"
+        - 
+          Key: "Type"
+          Value: 
+            Fn::ImportValue:
+              !Sub "${BaseStack}-tag-project-type"
+        - 
+          Key: "Description"
+          Value: 
+            Fn::ImportValue:
+              !Sub "${BaseStack}-tag-project-description"
+        - 
+          Key: "Deployment"
+          Value: 
+            Fn::ImportValue:
+              !Sub "${BaseStack}-tag-project-deployment"
         
       #Events:
       #  ProxyApiRoot:
