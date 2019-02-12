@@ -7,11 +7,11 @@ mkdir -p build
 mkdir -p sam-build
 
 cp sam-assets/package.json sam-build
-cd sam-build && npm install 
+cd sam-build && yarn
 
 cd $WSD/$API_DIR
-npm install 
-npm run build
+yarn
+yarn build
 
 cp -rp dist/ $WSD/devops/build/dist/
 echo "Changed to $PWD"

@@ -9,5 +9,5 @@ curl --header "X-Vault-Token:$VAULT_TOKEN" $VAULT_SERVER/v1/secret/$VAULT_SECRET
 # mkdir -p build_app
 
 cd $WSD/$APP_DIR
-npm install
-npm run build
+yarn
+yarn build
