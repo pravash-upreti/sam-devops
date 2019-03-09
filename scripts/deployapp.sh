@@ -6,7 +6,7 @@
 #     | tr '\r\n' ' ' )
 
 cd $WSD/$APP_DIR
-aws s3 sync build/ s3://$S3_WEBSITE_BUCKET_NAME/$1/$MICRO_SERVICE_NAME/
+aws s3 sync build/ s3://$S3_WEBSITE_BUCKET_NAME$1/$MICRO_SERVICE_NAME/
 
 # Only use this command for cached content 
 # aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
