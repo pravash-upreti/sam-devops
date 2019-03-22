@@ -9,7 +9,7 @@ parameter=$(python scripts/inliner.py \
     | jq .\
     | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" \
     | tr '\r\n' ' ')
-
+echo parameter
 aws cloudformation deploy --template-file sam-assets/template.yaml --parameter-overrides RDSState="$RDS_STATE" BaseStack="$STACK_NAME" RDSSecurityGroup="$RDS_SECURITY_GROUP"  $parameter --stack-name $STACK_NAME-$1-$MICRO_SERVICE_NAME
 STAGE=$1
 echo "Deploying the resources to default stage of"
