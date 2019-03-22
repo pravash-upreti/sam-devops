@@ -6,7 +6,8 @@ url = os.environ["VAULT_SERVER"]+"/v1/"+os.environ["KV_ENGINE_NAME"]+"/data/"+os
 headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8','X-Vault-Token':os.environ["VAULT_TOKEN"]}
 response = requests.get(url, headers=headers)
 response_dict = response.json()
-data = response_dict.get('data')
+parent_data = response_dict.get('data')
+data = parent_data.get('data')
 formatedData = {}
 for key in data:
     components = key.split('_')
