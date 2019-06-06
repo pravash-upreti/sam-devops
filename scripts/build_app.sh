@@ -14,14 +14,8 @@ curl --header "X-Vault-Token:$VAULT_TOKEN" $VAULT_SERVER/v1/$KV_ENGINE_NAME/data
 
 cat $WSD/$APP_DIR/.env
 
-
 # go to app directory
 cd $WSD/$APP_DIR
-
-echo .env > .env.development
-echo .env > .env.production
-
-ls -al
 
 # install the packages
 yarn
