@@ -47,11 +47,11 @@ post_build:
 
 deploy_api:
 	${INFO} "Deploying backend"
-	@ . ./scripts/deploy.sh ${env}
+	@ . ./scripts/deploy_api.sh ${env}
 	${INFO} "Backend deployment completed"
 
 
 deploy_app:
 	${INFO} "Deploying frontend"
-	@ . ./scripts/deployapp.sh ${env}
+	@ . ./scripts/deploy_app.sh ${env}
 	${INFO} "Frontend deployment completed"
