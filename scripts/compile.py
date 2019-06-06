@@ -5,54 +5,74 @@ import requests
 import json
 import pprint
 
-url = os.environ["VAULT_SERVER"]+"/v1/"+os.environ["KV_ENGINE_NAME"]+"/data/"+os.environ["VAULT_SECRET_DIR"]+'/'+os.environ["STAGE"]+'/api'
-headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8','X-Vault-Token':os.environ["VAULT_TOKEN"]}
-response = requests.get(url, headers=headers)
-response_dict = response.json()
-parent_data = response_dict.get('data')
-data = parent_data.get('data')
 
-formatedData = {}
+def get_vault_data():
 
-vaultData={}
-for key in data:
-    components = key.split('_')
-    vaultData.update({
-        key: components[0] + ''.join(x.title() for x in components[1:])
-    })
+    """ Return the json data from vault """
+
+    url = os.environ["VAULT_SERVER"]+"/v1/"+os.environ["KV_ENGINE_NAME"]+"/data/"+os.environ["VAULT_SECRET_DIR"]+'/'+os.environ["STAGE"]+'/api'
+    headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8','X-Vault-Token':os.environ["VAULT_TOKEN"]}
+    response = requests.get(url, headers=headers)
+
+    try:
+        response.raise_for_status()
+    except HTTPError as e:
+        raise SystemExit("Error: " + str(e))
+
+    response_dict = response.json()
+    parent_data = response_dict.get('data')
     
-formatedData.update({'vault' : vaultData })
-for key , value in os.environ.items():
-    formatedData.update({
-        key: value
+    return parent_data.get('data')
+
+
+def get_formated_data():
+
+    """ Return the key value pair """
+
+    data = get_vault_data()
+
+    formated_data = {}
+
+    vault_data = {}
+    
+    # Remove underscore from the json key 
+    for key in data:
+        components = key.split('_')
+        vault_data.update({
+            key: components[0] + ''.join(x.title() for x in components[1:])
+        })
+    
+    # Append environment key pair to formated_data dict
+    formated_data.update({'vault' : vault_data})
+    for key , value in os.environ.items():
+        formated_data.update({
+            key: value
+        })
+
+    # open the function name that is timestamp value 
+    formated_data.update({
+        "FUNCTION_NAME": open('function_name', 'r').readline().rstrip()
     })
 
-formatedData.update({
-    "FUNCTION_NAME": open('function_name', 'r').readline().rstrip()
-})
-
-# print formatedData
-env = Environment(loader = FileSystemLoader('./scripts'), trim_blocks=True, lstrip_blocks=True)
-
-# Compile template.yml
+    return formated_data
 
 
-template = env.get_template('template.yaml.j2')
-config_file = open("./sam-assets/template.yaml", "w+")
-config_file.write(template.render(list = [formatedData]))
+def compile():
 
-# # Compile simple proxy
-# nonFormatedData={}
-# for key in data:
-#     nonFormatedData.update({
-#         key: data[key]
-#     })
+    """ Compile the yaml template """
+    
+    # print formatedData
+    env = Environment(loader = FileSystemLoader('./scripts'), trim_blocks=True, lstrip_blocks=True)
+    
+    # Refrence the template file
+    template = env.get_template('template.yaml.j2')
 
-# for key , value in os.environ.items():
-#     nonFormatedData.update({
-#         key: value
-#     })
+    # open file to write the compiled template
+    config_file = open("./sam-assets/template.yaml", "w+")
+    
+    # write to the file
+    config_file.write(template.render(list = [get_formated_data()]))
 
-# proxy_api = env.get_template('simple-proxy-api.yaml.j2')
-# config_file = open("./sam-assets/simple-proxy-api.yaml", "w+")
-# config_file.write(proxy_api.render(nonFormatedData))
+
+if __name__ == "__main__":
+    compile()

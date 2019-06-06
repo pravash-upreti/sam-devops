@@ -1,62 +1,57 @@
 include Makefile.settings
 #! /bin/sh
+
+# working space directory is outside the devops folder
+
 export WSD=${PWD}/../
+
 .PHONY: build
+
+# pipeline is complete frontend backend deployment job
 
 pipeline:
 	${INFO} "Running pipeline ..."
-	${INFO} "Base directory ${WSD} "	
-	@ make buildapi
-	@ make buildapp
-	@ make invokeWithoutAWSLayer
-	@ make invokeFunctionBlackBox
-	@ make postbuild
-	@ make compileTemplate
-	@ make deploy env="${CI_COMMIT_REF_SLUG}"
-	@ make deployapp env="${CI_COMMIT_REF_SLUG}"
+	
+	# build stage
+	@ make build_api
+	@ make build_app
+	
+	# deploy stage
+	@ make post_build
+	@ make compile_template
+	@ make deploy_api env="${CI_COMMIT_REF_SLUG}"
+	@ make deploy_app env="${CI_COMMIT_REF_SLUG}"
+	
 	${INFO} "Completed CI/CD"
 
-buildapi:
-	${INFO} "Building ..."
-	@ . ./scripts/buildapi.sh
-	${INFO} "Completed"
+build_api:
+	${INFO} "Building Backend ..."
+	@ . ./scripts/build_api.sh
+	${INFO} "Backend build completed"
 
-buildapp:
-	${INFO} "Building ..."
-	@ . ./scripts/buildapp.sh
-	${INFO} "Completed"
+build_app:
+	${INFO} "Building Frontend..."
+	@ . ./scripts/build_app.sh
+	${INFO} "Frontend build completed"
 
 
-compileTemplate:
+compile_template:
 	${INFO} "Compiling template"
 	@ python ./scripts/compile.py
-	@ cat sam-assets/template.yaml
-	${INFO} "Completed"
+	${INFO} "Cloudformation template created"
 
-postbuild:
-	${INFO} "Making SAM compatible and uploading to s3 using deployer"
-	@ . ./scripts/postbuild.sh 
-	${INFO} "Completed"
+post_build:
+	${INFO} "Uploading to s3"
+	@ . ./scripts/post_build.sh 
+	${INFO} "Function uploaded to s3"
 
-invokeFunctionBlackBox:
-	${INFO} "Black Box function invocation"
-	@ docker run -v "${PWD}/tmp:/home/sbx_user1051" -v "${PWD}/build:/var/task" -e LOG_DIR='/tmp' -e BABEL_CACHE_PATH='/tmp/mycache.json' lambci/lambda:nodejs8.10 lambda.handler
-	${INFO} "Completed"
-
-invokeWithoutAWSLayer:
-	${INFO} "Invoke without AWS Layer"
-	@ docker build -t lambdanodewithoutawslayer:latest .
-	@ docker run -v ${PWD}/tmp:/home/sbx_user1051  -e LOG_DIR='/tmp' -e BABEL_CACHE_PATH='/tmp/mycache.json' lambdanodewithoutawslayer
-	${INFO} "Completed"
-
-
-deploy:
-	${INFO} "Deploying to environment"
+deploy_api:
+	${INFO} "Deploying backend"
 	@ . ./scripts/deploy.sh ${env}
-	${INFO} "Deploy completed"
+	${INFO} "Backend deployment completed"
 
 
-deployapp:
-	${INFO} "Deploying to environment"
+deploy_app:
+	${INFO} "Deploying frontend"
 	@ . ./scripts/deployapp.sh ${env}
-	${INFO} "Deploy completed"
+	${INFO} "Frontend deployment completed"

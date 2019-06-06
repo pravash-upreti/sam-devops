@@ -2,19 +2,22 @@
 
 # move devops assets package json to new build dir
 rm -rf build
-rm -rf sam-build
 mkdir -p build
-mkdir -p sam-build
-
-cp sam-assets/package.json sam-build
-cd sam-build && yarn
 
 cd $WSD/$API_DIR
+
+# install dependency
 yarn
+
+# install dependency for aws-serverless-express
+yarn add binary-case@1.0.0 
+yarn add type-is@1.6.16 
+
+# build the api
 yarn build
 
+# copy the dist folder to build folder inside devops 
 cp -rp dist/ $WSD/devops/build/dist/
-echo "Changed to $PWD"
 mkdir -p $WSD/devops/build/node_modules
 cp -rfp node_modules/* $WSD/devops/build/node_modules/ 
 cp -rp .env.example $WSD/devops/build/.env || echo "Could not find  .env.example"
@@ -22,19 +25,12 @@ cp -rp .babelrc $WSD/devops/build/ || echo "Couldnot find babelrc"
 cp -rp public/ $WSD/devops/build/public || echo "Couldnot find public  folder"
 cp -rp package.json $WSD/devops/build/ || echo "Couldnot find package.json  folder"
 
-# deploy to aws using SAM cli
+# copy require file from sam-assets folder
 cd $WSD/devops/
 
 cp -p sam-assets/lambda.js build/lambda.js
 cp -p sam-assets/app.js build/app.js
+cp -p sam-assets/aws-serverless-express.js build/aws-serverless-express.js
 
-#substitute the value
+# substitute the value
 sed -i 's#APP_MODULE_DIR#'${APP_MODULE_DIR:="dist/app"}'#g' ./build/app.js
-
-# cp -p sam-assets/app.js build/app.js
-cp -p sam-assets/test.js build/test.js
-#cp -p sam-assets/simple-proxy-api.yaml build/simple-proxy-api.yaml
-
-# do not override the original content
-# -rpn not supported in alpine
-cp -rpn ./sam-build/node_modules/* ./build/node_modules

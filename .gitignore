@@ -4,3 +4,5 @@ build/*
 logs/*
 sam-build/*
 tmp/*
+function_name
+sam-assets/template.yaml
