@@ -12,6 +12,8 @@ curl --header "X-Vault-Token:$VAULT_TOKEN" $VAULT_SERVER/v1/$KV_ENGINE_NAME/data
     # store the key value to .env file which is used during app build process
     > $WSD/$APP_DIR/.env
 
+cat $WSD/$APP_DIR/.env
+
 # go to app directory
 cd $WSD/$APP_DIR
 
