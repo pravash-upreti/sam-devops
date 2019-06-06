@@ -17,6 +17,10 @@ cat $WSD/$APP_DIR/.env
 # go to app directory
 cd $WSD/$APP_DIR
 
+cat .env
+echo 
+cat .env.example
+
 # install the packages
 yarn
 
