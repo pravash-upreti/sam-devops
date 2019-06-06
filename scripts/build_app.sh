@@ -14,6 +14,14 @@ curl --header "X-Vault-Token:$VAULT_TOKEN" $VAULT_SERVER/v1/$KV_ENGINE_NAME/data
 
 cat $WSD/$APP_DIR/.env
 
+env
+
+set -a # automatically export all variables
+source $WSD/$APP_DIR/.env
+set +a
+
+env
+
 # go to app directory
 cd $WSD/$APP_DIR
 
