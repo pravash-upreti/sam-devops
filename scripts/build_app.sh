@@ -9,7 +9,6 @@ curl --header "X-Vault-Token:$VAULT_TOKEN" $VAULT_SERVER/v1/$KV_ENGINE_NAME/data
     # convert the json string to key value and store the key value to .env file which is used during app build process
     jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" > $WSD/$APP_DIR/.env
 
-echo "logging the environment file"
 cat $WSD/$APP_DIR/.env
 
 # go to app directory
@@ -20,5 +19,3 @@ yarn
 
 # build the src
 yarn build
-echo "logging the environment file"
-cat .env
